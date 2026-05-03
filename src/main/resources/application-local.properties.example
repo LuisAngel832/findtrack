@@ -1,0 +1,8 @@
+spring.application.name=FindTrack
+spring.profiles.active=# valor de la sesion a utilizar
+
+spring.datasource.url=#url de la base de datos
+spring.datasource.username=#Usuario de la base de datos
+spring.datasource.password=#contraseña de la base de datos
+
+jwt.secret=#clabe secreta para generar tokens

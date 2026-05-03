@@ -1,4 +1,4 @@
-package com.universidad.proyecto.FindTrack.model;
+package com.universidad.proyecto.findtrack.model;
 
 
 import java.util.UUID;
