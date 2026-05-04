@@ -1,11 +1,11 @@
-package com.universidad.proyecto.FindTrack.repository;
+package com.universidad.proyecto.findtrack.repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.universidad.proyecto.FindTrack.model.User;
+import com.universidad.proyecto.findtrack.model.User;
 
 
 

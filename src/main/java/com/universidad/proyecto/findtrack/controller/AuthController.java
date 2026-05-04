@@ -10,6 +10,8 @@ import com.universidad.proyecto.findtrack.service.AutnService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.universidad.proyecto.findtrack.dto.request.LogInRequestDTO;
 import com.universidad.proyecto.findtrack.dto.request.RegisterRequestDTO;
 import com.universidad.proyecto.findtrack.dto.response.AuthResponseDTO;
 import jakarta.validation.Valid;
@@ -26,6 +28,12 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
         AuthResponseDTO response = autnService.register(request);
         return ResponseEntity.created(null).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LogInRequestDTO request) {
+        AuthResponseDTO response = autnService.login(request);
+        return ResponseEntity.ok(response);
     }
 
 }
