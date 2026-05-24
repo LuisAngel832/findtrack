@@ -2,9 +2,15 @@ package com.universidad.proyecto.findtrack.security;
 
 import org.springframework.stereotype.Component;
 
+import com.universidad.proyecto.findtrack.exceptions.InvalidTokenException;
+import com.universidad.proyecto.findtrack.exceptions.TokenExpiredException;
+
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.AuthenticationException;
+
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -23,15 +29,17 @@ public class JwtUtil {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try{
             Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
                 .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
+            
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException("Token expirado");
+        }catch(Exception e){
+            throw new InvalidTokenException("Token inválido");
         }
     }
 
