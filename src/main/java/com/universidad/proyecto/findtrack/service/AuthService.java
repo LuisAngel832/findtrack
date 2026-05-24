@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.universidad.proyecto.findtrack.dto.response.AuthResponseDTO;
-import com.universidad.proyecto.findtrack.exeptions.EmailAlreadyExistsException;
-import com.universidad.proyecto.findtrack.exeptions.InvalidCredentialsExeption;
+import com.universidad.proyecto.findtrack.exceptions.EmailAlreadyExistsException;
+import com.universidad.proyecto.findtrack.exceptions.InvalidCredentialsExeption;
 import com.universidad.proyecto.findtrack.dto.request.LogInRequestDTO;
 import com.universidad.proyecto.findtrack.dto.request.RegisterRequestDTO;
 
@@ -22,7 +22,7 @@ import com.universidad.proyecto.findtrack.security.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
-public class AutnService {
+public class AuthService {
     
     private final UserRepository userRepository;
 
@@ -58,5 +58,7 @@ public class AutnService {
         String token = jwtUtil.generateToken(user.getId());
         return new AuthResponseDTO(token);
     }
+
+
 
 }
