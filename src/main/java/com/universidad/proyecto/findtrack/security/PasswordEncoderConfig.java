@@ -1,4 +1,4 @@
-package com.universidad.proyecto.findtrack.config;
+package com.universidad.proyecto.findtrack.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

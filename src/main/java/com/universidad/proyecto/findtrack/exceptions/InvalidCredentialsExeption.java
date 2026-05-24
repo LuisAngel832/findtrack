@@ -1,4 +1,4 @@
-package com.universidad.proyecto.findtrack.exeptions;
+package com.universidad.proyecto.findtrack.exceptions;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
