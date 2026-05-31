@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class InvalidCredentialsExeption extends RuntimeException {
-    public InvalidCredentialsExeption(String message) {
+public class InvalidCredentialsException extends RuntimeException {
+    public InvalidCredentialsException(String message) {
         super(message);
     }
     
