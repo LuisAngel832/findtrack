@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.universidad.proyecto.findtrack.dto.response.AuthResponseDTO;
 import com.universidad.proyecto.findtrack.exceptions.EmailAlreadyExistsException;
-import com.universidad.proyecto.findtrack.exceptions.InvalidCredentialsExeption;
+import com.universidad.proyecto.findtrack.exceptions.InvalidCredentialsException;
 import com.universidad.proyecto.findtrack.dto.request.LogInRequestDTO;
 import com.universidad.proyecto.findtrack.dto.request.RegisterRequestDTO;
 
@@ -51,9 +51,9 @@ public class AuthService {
 
     public AuthResponseDTO login(LogInRequestDTO request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsExeption("Credenciales inválidas"));
+                .orElseThrow(() -> new InvalidCredentialsException("Credenciales inválidas"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsExeption("Credenciales inválidas");
+            throw new InvalidCredentialsException("Credenciales inválidas");
         }
         String token = jwtUtil.generateToken(user.getId());
         return new AuthResponseDTO(token);
