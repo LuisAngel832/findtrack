@@ -1,3 +1,5 @@
+SET client_encoding = 'UTF8';
+
 INSERT INTO categories (name, type, user_id, is_default, icon) VALUES
 	('Alimentación', 'expense', NULL, TRUE, NULL),
 	('Transporte', 'expense', NULL, TRUE, NULL),
