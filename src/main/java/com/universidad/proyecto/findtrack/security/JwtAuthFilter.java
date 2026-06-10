@@ -38,9 +38,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String jwtToken = authHeader.substring(7);
 
-                jwtUtil.validateToken(jwtToken);
+                
 
-                UUID userId = jwtUtil.getUserIdFromToken(jwtToken);
+                UUID userId = jwtUtil.validateToken(jwtToken);
                 UserPrincipal userDetails = userDetailsService.loadUserByUsername(userId.toString());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
