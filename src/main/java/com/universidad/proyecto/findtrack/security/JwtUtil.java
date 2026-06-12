@@ -8,7 +8,6 @@ import com.universidad.proyecto.findtrack.exceptions.TokenExpiredException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.AuthenticationException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -29,12 +28,15 @@ public class JwtUtil {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public UUID validateToken(String token) {
         try{
-            Jwts.parserBuilder()
+            String userId = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
-                .parseClaimsJws(token);
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+        return UUID.fromString(userId);
             
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException("Token expirado");
@@ -43,14 +45,6 @@ public class JwtUtil {
         }
     }
 
-    public UUID getUserIdFromToken(String token) {
-        String userId = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-        return UUID.fromString(userId);
-    }
+
 
 }
