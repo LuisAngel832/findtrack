@@ -32,7 +32,6 @@ public class Category {
 
     private String icon;
 
-    @Enumerated(EnumType.STRING)
     private CategoryType type;
 
     private boolean isDefault;
