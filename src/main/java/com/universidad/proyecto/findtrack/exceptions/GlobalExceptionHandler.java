@@ -34,6 +34,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildExceptionResponse(HttpStatus.CONFLICT, "Violación de integridad de datos"));
     }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleCategoryInUseException(CategoryInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildExceptionResponse(HttpStatus.CONFLICT, ex.getMessage()));
+    }
  
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ExceptionResponseDTO> handleAccessDeniedException(AccessDeniedException ex) {
