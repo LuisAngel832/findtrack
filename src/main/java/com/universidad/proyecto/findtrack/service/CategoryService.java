@@ -1,5 +1,6 @@
 package com.universidad.proyecto.findtrack.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,20 +55,30 @@ public class CategoryService {
 
     public void deleteCategory(UUID categoryId, UUID userId) {
         Category category = categoryRepository.findById(categoryId)
-        .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));
 
-        if(category.isDefault()) {
+        if (category.isDefault()) {
             throw new AccessDeniedException("No se puede eliminar una categoría predeterminada");
         }
 
-        if(!category.getUserId().equals(userId)) {
+        if (!category.getUserId().equals(userId)) {
             throw new AccessDeniedException("No se puede eliminar una categoría que no pertenece al usuario");
         }
 
-        if(categoryRepository.existsTransactionsByCategoryId(categoryId)) {
-            throw new CategoryInUseException("No se puede eliminar la categoría porque está en uso por una transacción");
+        if (categoryRepository.existsTransactionsByCategoryId(categoryId)) {
+            throw new CategoryInUseException(
+                    "No se puede eliminar la categoría porque está en uso por una transacción");
         }
         categoryRepository.delete(category);
+    }
+
+    public Category findCategoryOrThrow(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada"));  
+    }
+
+    public List<Category> findCategoriesByIds(Collection<UUID> categoryIds) {
+        return categoryRepository.findAllById(categoryIds);
     }
 
 
