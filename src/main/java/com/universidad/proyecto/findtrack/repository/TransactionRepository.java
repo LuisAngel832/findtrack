@@ -1,0 +1,25 @@
+package com.universidad.proyecto.findtrack.repository;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.universidad.proyecto.findtrack.model.Transaction;
+import com.universidad.proyecto.findtrack.model.TransactionType;
+
+public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
+
+    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId " +
+            "AND (:type IS NULL OR t.type = :type) " +
+            "AND (:categoryId IS NULL OR t.categoryId = :categoryId) " +
+            "AND (:year IS NULL OR EXTRACT(YEAR FROM t.date) = :year) " +
+            "AND (:month IS NULL OR EXTRACT(MONTH FROM t.date) = :month)")
+    List<Transaction> findWithFilters(@Param("userId") UUID userId,
+            @Param("type") TransactionType type,
+            @Param("categoryId") UUID categoryId,
+            @Param("year") Integer year,
+            @Param("month") Integer month);
+}
