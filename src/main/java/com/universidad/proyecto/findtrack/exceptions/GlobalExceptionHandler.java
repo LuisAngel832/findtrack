@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.universidad.proyecto.findtrack.dto.response.ExceptionResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.FieldErrorDTO;
@@ -33,6 +34,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildExceptionResponse(HttpStatus.CONFLICT, "Violación de integridad de datos"));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildExceptionResponse(HttpStatus.BAD_REQUEST, "Tipo de argumento inválido " + ex.getName() + ": " + ex.getValue()));
     }
 
     @ExceptionHandler(CategoryInUseException.class)
@@ -67,6 +73,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponseDTO> handleGenericException(Exception ex) {
+        ex.printStackTrace(); // Log the exception for debugging purposes
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado"));
     }
 
