@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.function.Function;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.universidad.proyecto.findtrack.dto.request.TransactionRequestDTO;
@@ -27,11 +26,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
     public TransactionResponseDTO createTransaction(TransactionRequestDTO transactionRequest, UUID userId) {
-        Category category = categoryService.findCategoryOrThrow(transactionRequest.getCategoryId());
-
-        if(!(category.isDefault() || category.getUserId().equals(userId))) {
-            throw new AccessDeniedException("No tiene permiso para usar esta categoría");
-        }
+        Category category = categoryService.getUsableCategory(transactionRequest.getCategoryId(), userId);
 
         TransactionType transactionType = TransactionType.valueOf(transactionRequest.getType());
 

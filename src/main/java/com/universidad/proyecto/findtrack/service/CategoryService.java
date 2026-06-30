@@ -82,4 +82,13 @@ public class CategoryService {
     }
 
 
+    public Category getUsableCategory(UUID categoryId, UUID userId) {
+        Category category = findCategoryOrThrow(categoryId);
+
+        if (!(category.isDefault() || category.getUserId().equals(userId))) {
+            throw new AccessDeniedException("No tiene permiso para usar esta categoría");
+        }
+
+        return category;
+    }
 }
