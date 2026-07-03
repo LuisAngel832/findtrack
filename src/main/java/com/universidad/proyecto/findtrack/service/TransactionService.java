@@ -6,11 +6,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.function.Function;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.universidad.proyecto.findtrack.dto.request.TransactionRequestDTO;
 import com.universidad.proyecto.findtrack.dto.response.CategoryResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.TransactionResponseDTO;
+import com.universidad.proyecto.findtrack.exceptions.ResourceNotFoundException;
 import com.universidad.proyecto.findtrack.model.Category;
 import com.universidad.proyecto.findtrack.model.Transaction;
 import com.universidad.proyecto.findtrack.model.TransactionType;
@@ -59,6 +62,51 @@ public class TransactionService {
                 categoryResponse
         );
     }
+
+
+    @Transactional
+    public TransactionResponseDTO updateTransaction(TransactionRequestDTO transactionRequest, UUID transactionId, UUID userId) {
+        
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada"));
+
+        if (!userId.equals(transaction.getUserId())) {
+            throw new AccessDeniedException("No tiene permiso para actualizar esta transacción");
+        }
+
+        Category category = categoryService.getUsableCategory(transactionRequest.getCategoryId(), userId);
+
+        TransactionType transactionType = TransactionType.valueOf(transactionRequest.getType());
+
+        transaction.update(
+                category.getId(),
+                transactionRequest.getAmount(),
+                transactionType,
+                transactionRequest.getDescription(),
+                transactionRequest.getDate()
+        );
+
+        return new TransactionResponseDTO(
+                transaction.getId(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getDescription(),
+                transaction.getDate(),
+                transaction.getCreatedAt(),
+                new CategoryResponseDTO(
+                        category.getId(),
+                        category.getName(),
+                        category.getIcon(),
+                        category.getType(),
+                        category.isDefault()
+                )
+        );
+        
+    }
+
+
+
+
 
     public List<TransactionResponseDTO> getTransactions(UUID userId, TransactionType type, UUID categoryId, Integer year, Integer month) {
         List<Transaction> transactions = transactionRepository.findWithFilters(userId, type, categoryId, year, month);
