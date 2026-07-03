@@ -49,8 +49,7 @@ public class TransactionService {
                 category.getName(),
                 category.getIcon(),
                 category.getType(),
-                category.isDefault()
-        );
+                category.isDefault());
 
         return new TransactionResponseDTO(
                 transaction.getId(),
@@ -59,14 +58,13 @@ public class TransactionService {
                 transaction.getDescription(),
                 transaction.getDate(),
                 transaction.getCreatedAt(),
-                categoryResponse
-        );
+                categoryResponse);
     }
 
-
     @Transactional
-    public TransactionResponseDTO updateTransaction(TransactionRequestDTO transactionRequest, UUID transactionId, UUID userId) {
-        
+    public TransactionResponseDTO updateTransaction(TransactionRequestDTO transactionRequest, UUID transactionId,
+            UUID userId) {
+
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada"));
 
@@ -83,8 +81,7 @@ public class TransactionService {
                 transactionRequest.getAmount(),
                 transactionType,
                 transactionRequest.getDescription(),
-                transactionRequest.getDate()
-        );
+                transactionRequest.getDate());
 
         return new TransactionResponseDTO(
                 transaction.getId(),
@@ -98,17 +95,12 @@ public class TransactionService {
                         category.getName(),
                         category.getIcon(),
                         category.getType(),
-                        category.isDefault()
-                )
-        );
-        
+                        category.isDefault()));
+
     }
 
-
-
-
-
-    public List<TransactionResponseDTO> getTransactions(UUID userId, TransactionType type, UUID categoryId, Integer year, Integer month) {
+    public List<TransactionResponseDTO> getTransactions(UUID userId, TransactionType type, UUID categoryId,
+            Integer year, Integer month) {
         List<Transaction> transactions = transactionRepository.findWithFilters(userId, type, categoryId, year, month);
 
         List<UUID> categoryIds = transactions.stream()
@@ -122,26 +114,38 @@ public class TransactionService {
                 .collect(Collectors.toMap(Category::getId, Function.identity()));
 
         return transactions.stream()
-            .map(transaction -> {
-                Category category = categoriesById.get(transaction.getCategoryId());
+                .map(transaction -> {
+                    Category category = categoriesById.get(transaction.getCategoryId());
 
-                CategoryResponseDTO categoryResponse = new CategoryResponseDTO(
-                    category.getId(),
-                    category.getName(),
-                    category.getIcon(),
-                    category.getType(),
-                    category.isDefault());
+                    CategoryResponseDTO categoryResponse = new CategoryResponseDTO(
+                            category.getId(),
+                            category.getName(),
+                            category.getIcon(),
+                            category.getType(),
+                            category.isDefault());
 
-                return new TransactionResponseDTO(
-                    transaction.getId(),
-                    transaction.getAmount(),
-                    transaction.getType(),
-                    transaction.getDescription(),
-                    transaction.getDate(),
-                    transaction.getCreatedAt(),
-                    categoryResponse);
-            })
-            .toList();
+                    return new TransactionResponseDTO(
+                            transaction.getId(),
+                            transaction.getAmount(),
+                            transaction.getType(),
+                            transaction.getDescription(),
+                            transaction.getDate(),
+                            transaction.getCreatedAt(),
+                            categoryResponse);
+                })
+                .toList();
+    }
+
+    @Transactional
+    public void deleteTransaction(UUID transactionId, UUID userId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada"));
+
+        if (!userId.equals(transaction.getUserId())) {
+            throw new AccessDeniedException("No tiene permiso para eliminar esta transacción");
+        }
+
+        transactionRepository.delete(transaction);
     }
 
 }
