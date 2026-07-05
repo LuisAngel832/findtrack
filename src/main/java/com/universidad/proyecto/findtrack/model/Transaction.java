@@ -58,5 +58,13 @@ public class Transaction {
 
     @CreationTimestamp
     private Instant createdAt;
+
+    public void update(UUID categoryId, BigDecimal amount, TransactionType type, String description, LocalDate date) {
+        this.categoryId = categoryId;
+        this.amount = amount;
+        this.type = type;
+        this.description = description;
+        this.date = date;
+    }
     
 }
