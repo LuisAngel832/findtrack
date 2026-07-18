@@ -1,6 +1,7 @@
 package com.universidad.proyecto.findtrack.service;
 
 import java.util.Map;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.universidad.proyecto.findtrack.dto.CategorySpent;
 import com.universidad.proyecto.findtrack.dto.request.TransactionRequestDTO;
 import com.universidad.proyecto.findtrack.dto.response.CategoryResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.TransactionResponseDTO;
@@ -146,6 +148,13 @@ public class TransactionService {
         }
 
         transactionRepository.delete(transaction);
+    }
+
+    public List<CategorySpent> getSpentByCategory(UUID userId, Integer month, Integer year) {
+        LocalDate inicioMes = LocalDate.of(year, month, 1);
+        LocalDate inicioMesSiguiente = inicioMes.plusMonths(1);
+
+        return transactionRepository.findSpentByMonth(userId, inicioMes, inicioMesSiguiente);
     }
 
 }
