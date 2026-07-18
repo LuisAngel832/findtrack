@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -73,11 +74,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponseDTO> handleGenericException(Exception ex) {
-        ex.printStackTrace(); // Log the exception for debugging purposes
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado"));
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(buildExceptionResponse(HttpStatus.BAD_REQUEST, "Falta un parámetro de solicitud requerido: " + ex.getParameterName()));
+    }
 
+    @ExceptionHandler(DuplicateBudgetException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleDuplicateBudgetException(DuplicateBudgetException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildExceptionResponse(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+  
 
     private ExceptionResponseDTO buildExceptionResponse(HttpStatus status, String message) {
         return new ExceptionResponseDTO(
