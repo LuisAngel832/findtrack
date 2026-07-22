@@ -14,7 +14,7 @@ public class BudgetResponseDTO {
    
     private UUID id;
 
-    private UUID categoryId;
+    private CategorySummaryDTO category;
 
     private BigDecimal limitAmount;
 
@@ -30,4 +30,12 @@ public class BudgetResponseDTO {
 
     private boolean alertTriggered;
 
+
+    @AllArgsConstructor
+    @Getter
+    @NoArgsConstructor
+    public static class CategorySummaryDTO {
+        private UUID id;
+        private String name;
+    }
 }
