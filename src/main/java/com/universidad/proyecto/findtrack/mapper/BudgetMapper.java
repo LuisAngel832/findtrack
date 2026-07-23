@@ -10,10 +10,12 @@ import com.universidad.proyecto.findtrack.model.Budget;
 public class BudgetMapper {
 
     public static BudgetResponseDTO toDTO(Budget budget, BigDecimal spentAmount, BigDecimal usagePercentage,
-            boolean alertTriggered) {
+            boolean alertTriggered, String categoryName) {
+
+
         return new BudgetResponseDTO(
                 budget.getId(),
-                budget.getCategoryId(),
+                new BudgetResponseDTO.CategorySummaryDTO(budget.getCategoryId(), categoryName),
                 budget.getLimitAmount(),
                 budget.getMonth(),
                 budget.getYear(),
