@@ -1,5 +1,6 @@
 package com.universidad.proyecto.findtrack.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -33,6 +34,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
                         "AND t.date < :inicioMesSiguiente " +
                         "GROUP BY t.categoryId")
         List<CategorySpent> findSpentByMonth(@Param("userId") UUID userId,
+                        @Param("inicioMes") LocalDate inicioMes,
+                        @Param("inicioMesSiguiente") LocalDate inicioMesSiguiente);
+
+        @Query("SELECT COALESCE(SUM(t.amount), cast(0 as big_decimal)) FROM Transaction t " +
+                        "WHERE t.userId = :userId " +
+                        "AND t.type = :type " +
+                        "AND t.date >= :inicioMes " +
+                        "AND t.date < :inicioMesSiguiente")
+        BigDecimal sumAmountByUserAndTypeAndDate(@Param("userId") UUID userId, @Param("type") TransactionType type,
+                        @Param("inicioMes") LocalDate inicioMes,
+                        @Param("inicioMesSiguiente") LocalDate inicioMesSiguiente);
+
+        @Query("SELECT COUNT(t) FROM Transaction t " +
+                        "WHERE t.userId = :userId " +
+                        "AND t.date >= :inicioMes " +
+                        "AND t.date < :inicioMesSiguiente")
+        Long countTransactionsByUserAndDate(@Param("userId") UUID userId,
                         @Param("inicioMes") LocalDate inicioMes,
                         @Param("inicioMesSiguiente") LocalDate inicioMesSiguiente);
 }
