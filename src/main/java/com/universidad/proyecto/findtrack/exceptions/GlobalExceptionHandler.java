@@ -3,6 +3,7 @@ package com.universidad.proyecto.findtrack.exceptions;
 import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import com.universidad.proyecto.findtrack.dto.response.ExceptionResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.FieldErrorDTO;
+
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -86,6 +89,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseDTO> handleDuplicateBudgetException(DuplicateBudgetException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(buildExceptionResponse(HttpStatus.CONFLICT, ex.getMessage()));
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ExceptionResponseDTO> handleConstraintViolationException(ConstraintViolationException ex) {
+
+        String message = ex.getConstraintViolations().stream()
+                .map(violation -> {
+                    String field = getLastSegment(violation.getPropertyPath().toString());
+                    return field + ": " + violation.getMessage();
+                })
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildExceptionResponse(HttpStatus.BAD_REQUEST, message));
+    }
+
+
+    private String getLastSegment(String path) {
+        int index = path.lastIndexOf('.');
+        return path.substring(index + 1);
+    }
+
 
   
 

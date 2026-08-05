@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import com.universidad.proyecto.findtrack.dto.CategorySpent;
 import com.universidad.proyecto.findtrack.model.Transaction;
 import com.universidad.proyecto.findtrack.model.TransactionType;
+import com.universidad.proyecto.findtrack.projection.CategorySpentSummary;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
@@ -53,4 +54,22 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         Long countTransactionsByUserAndDate(@Param("userId") UUID userId,
                         @Param("inicioMes") LocalDate inicioMes,
                         @Param("inicioMesSiguiente") LocalDate inicioMesSiguiente);
+
+
+        @Query("SELECT new com.universidad.proyecto.findtrack.projection.CategorySpentSummary(" +
+                        "c.id, c.name, c.icon, SUM(t.amount), COUNT(t)) " +
+                        "FROM Transaction t " +
+                        "JOIN Category c ON c.id = t.categoryId " +
+                        "WHERE t.userId = :userId " +
+                        "AND t.type = :type " +
+                        "AND t.date >= :monthStart " +
+                        "AND t.date < :nextMonthStart " +
+                        "GROUP BY c.id, c.name, c.icon " +
+                        "ORDER BY SUM(t.amount) DESC")
+        List<CategorySpentSummary> findCategorySpentSummaryByMonth(@Param("userId") UUID userId,
+                        @Param("monthStart") LocalDate monthStart,
+                        @Param("nextMonthStart") LocalDate nextMonthStart,
+                        @Param("type") TransactionType type);
+
+
 }
