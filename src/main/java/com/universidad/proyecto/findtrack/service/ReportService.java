@@ -3,19 +3,27 @@ package com.universidad.proyecto.findtrack.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.universidad.proyecto.findtrack.common.DateRange;
+import com.universidad.proyecto.findtrack.common.DateRangeUtil;
+import com.universidad.proyecto.findtrack.dto.response.DailyTimelineResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.ExpensesByCategoryResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.MonthlySummaryDTO;
 import com.universidad.proyecto.findtrack.model.TransactionType;
 import com.universidad.proyecto.findtrack.projection.CategorySpentSummary;
+import com.universidad.proyecto.findtrack.projection.DailyTotals;
 import com.universidad.proyecto.findtrack.repository.TransactionRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -99,4 +107,38 @@ public class ReportService {
 
         }
 
+        public List<DailyTimelineResponseDTO> getMonthlyTimeline(UUID userId, YearMonth yearMonth) {
+                DateRange dateRange = DateRangeUtil.getDateRange(yearMonth);
+
+                List<DailyTotals> dailyTotalsList = transactionRepository
+                                .findDailyTotals(
+                                                userId,
+                                                dateRange.monthStart(),
+                                                dateRange.nextMonthStart(),
+                                                TransactionType.INCOME,
+                                                TransactionType.EXPENSE);
+
+                Map<LocalDate, DailyTotals> dailyTotalsMap = dailyTotalsList.stream()
+                                .collect(Collectors.toMap(DailyTotals::date, Function.identity()));
+
+                return IntStream.rangeClosed(1, yearMonth.lengthOfMonth())
+                                .mapToObj(yearMonth::atDay) 
+                                .map(date -> toResponse(date, dailyTotalsMap.get(date))) 
+                                .toList(); 
+        }
+
+        
+
+        private DailyTimelineResponseDTO toResponse(LocalDate date, DailyTotals dailyTotals) {
+                Optional<DailyTotals> totals = Optional.ofNullable(dailyTotals);
+                return new DailyTimelineResponseDTO(
+                                date,
+                                normalizeAmount(totals.map(DailyTotals::totalExpenses).orElse(null)),
+                                normalizeAmount(totals.map(DailyTotals::totalIncome).orElse(null)));
+        }
+
+        private BigDecimal normalizeAmount(BigDecimal value) {
+                return Optional.ofNullable(value)
+                                .orElse(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+        }
 }
