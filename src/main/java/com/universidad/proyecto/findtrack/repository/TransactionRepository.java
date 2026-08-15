@@ -13,6 +13,7 @@ import com.universidad.proyecto.findtrack.dto.CategorySpent;
 import com.universidad.proyecto.findtrack.model.Transaction;
 import com.universidad.proyecto.findtrack.model.TransactionType;
 import com.universidad.proyecto.findtrack.projection.CategorySpentSummary;
+import com.universidad.proyecto.findtrack.projection.DailyTotals;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
@@ -70,6 +71,22 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
                         @Param("monthStart") LocalDate monthStart,
                         @Param("nextMonthStart") LocalDate nextMonthStart,
                         @Param("type") TransactionType type);
+
+
+        @Query("SELECT new com.universidad.proyecto.findtrack.projection.DailyTotals(" +
+                        "t.date, " +
+                        "SUM(CASE WHEN t.type = :expenseType THEN t.amount ELSE 0 END), " +
+                        "SUM(CASE WHEN t.type = :incomeType THEN t.amount ELSE 0 END)) " +
+                        "FROM Transaction t " +
+                        "WHERE t.userId = :userId " +
+                        "AND t.date >= :startInclusive " +
+                        "AND t.date < :endExclusive " +
+                        "GROUP BY t.date ")
+        List<DailyTotals> findDailyTotals(@Param("userId") UUID userId,
+                        @Param("startInclusive") LocalDate startInclusive,
+                        @Param("endExclusive") LocalDate endExclusive,
+                        @Param("incomeType") TransactionType incomeType,
+                        @Param("expenseType") TransactionType expenseType);
 
 
 }
