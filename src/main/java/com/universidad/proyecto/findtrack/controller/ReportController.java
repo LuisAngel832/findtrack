@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.universidad.proyecto.findtrack.common.DateRange;
 import com.universidad.proyecto.findtrack.common.DateRangeUtil;
+import com.universidad.proyecto.findtrack.dto.response.DailyTimelineResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.ExpensesByCategoryResponseDTO;
 import com.universidad.proyecto.findtrack.dto.response.MonthlySummaryDTO;
 import com.universidad.proyecto.findtrack.model.TransactionType;
@@ -53,5 +54,18 @@ public class ReportController {
         List<ExpensesByCategoryResponseDTO> expenses = reportService.expensesByCategory(userPrincipal.getId(), dateRange, type);
         return ResponseEntity.ok(expenses);
     }
+
+    @GetMapping("/timeline")
+    public ResponseEntity<List<DailyTimelineResponseDTO>> getTimeline(
+            @RequestParam  @Min(1) @Max(12) int month,
+            @RequestParam @Min(2000) @Max(2100) int year,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        YearMonth yearMonth = YearMonth.of(year, month);
+
+        List<DailyTimelineResponseDTO> timeline = reportService.getMonthlyTimeline(userPrincipal.getId(), yearMonth);
+        return ResponseEntity.ok(timeline);
+    }
+    
 
 }
